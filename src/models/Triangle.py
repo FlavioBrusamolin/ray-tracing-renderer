@@ -1,7 +1,7 @@
 import math
 
-from .shape import Shape
-from .intersection import Intersection
+from .Shape import Shape
+from .Intersection import Intersection
 
 from utils.math import VectorOperator, epsilon
 

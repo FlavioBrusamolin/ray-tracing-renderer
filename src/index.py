@@ -1,7 +1,7 @@
-from models.vertex import Vertex
-from models.triangle import Triangle
-from models.scene import Scene
-from models.ray import Ray
+from models.Vertex import Vertex
+from models.Triangle import Triangle
+from models.Scene import Scene
+from models.Ray import Ray
 
 from utils.math import Vector3, Vector2
 
