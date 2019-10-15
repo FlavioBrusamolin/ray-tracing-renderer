@@ -6,20 +6,20 @@ from models.Ray import Ray
 from utils.math import Vector3, Vector2
 
 
-def createVertex(x, y, z, u, v):
+def createVertex(x, y, z, s, t):
     position = Vector3(x, y, z)
     normal = Vector3(0, 0, 1)
-    uv = Vector2(u, v)
+    st = Vector2(s, t)
 
-    return Vertex(position.data, normal.data, uv.data)
+    return Vertex(position.data, normal.data, st.data)
 
 
 def main():
-    vertex1 = createVertex(0, 0, 0, 0, 0)
-    vertex2 = createVertex(2, 0, 0, 1, 0)
-    vertex3 = createVertex(1, 2, 0, 0, 1)
+    vertex0 = createVertex(0, 0, 0, 0, 0)
+    vertex1 = createVertex(2, 0, 0, 1, 0)
+    vertex2 = createVertex(1, 2, 0, 0, 1)
 
-    vertices = [vertex1, vertex2, vertex3]
+    vertices = [vertex0, vertex1, vertex2]
 
     triangle = Triangle(vertices, 'BSDF')
     shapes = [triangle]
@@ -33,7 +33,12 @@ def main():
     intersection = scene.intersects(ray)
 
     print(
-        f'Hit: {intersection.hit}\nDistance: {intersection.distance}\nIndex: {intersection.index}')
+        f'Hit: {intersection.hit}\nDistance: {intersection.distance}\nIndex: {intersection.index}\nUV: {intersection.uv}')
+
+    shader_globals = triangle.calculate_shader_globals(ray, intersection)
+
+    print(
+        f'\nPoint:{shader_globals.point}\nNormal:{shader_globals.normal}\nUV:{shader_globals.uv}\nST:{shader_globals.st}\nView direction:{shader_globals.view_direction}')
 
 
 if __name__ == "__main__":

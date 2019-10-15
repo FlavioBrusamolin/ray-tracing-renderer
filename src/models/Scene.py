@@ -9,7 +9,7 @@ class Scene(object):
         self.shapes = shapes
 
     def intersects(self, ray):
-        intersection = Intersection(False, math.inf, -1)
+        intersection = Intersection(False, math.inf, -1, None)
 
         for shape in self.shapes:
             shape_intersection = shape.intersects(ray)

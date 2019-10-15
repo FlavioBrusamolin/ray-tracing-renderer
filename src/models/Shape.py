@@ -11,9 +11,9 @@ class Shape(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def calculateShaderGlobals(self, ray, intersection):
+    def calculate_shader_globals(self, ray, intersection):
         pass
 
     @abstractmethod
-    def surfaceArea(self):
+    def surface_area(self):
         pass
