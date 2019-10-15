@@ -1,8 +1,9 @@
-import numpy as np
 import math
 
-from .Shape import Shape
-from .Intersection import Intersection
+from .shape import Shape
+from .intersection import Intersection
+
+from utils.math import VectorOperator, epsilon
 
 
 class Triangle(Shape):
@@ -12,34 +13,36 @@ class Triangle(Shape):
         self.vertices = vertices
 
     def intersects(self, ray):
+        vector_operator = VectorOperator()
+
         intersect = Intersection(False, math.inf, -1)
 
         v0v1 = self.vertices[1].position - self.vertices[0].position
         v0v2 = self.vertices[2].position - self.vertices[0].position
 
-        pvec = np.cross(ray.direction, v0v2)
-        det = np.dot(v0v1, pvec)
+        pvec = vector_operator.cross_product(ray.direction, v0v2)
+        det = vector_operator.dot_product(v0v1, pvec)
 
-        if det < np.finfo(float).eps:
+        if det < epsilon:
             return intersect
 
-        if abs(det) < np.finfo(float).eps:
+        if math.fabs(det) < epsilon:
             return intersect
 
         inv_det = 1 / det
         tvec = ray.origin - self.vertices[0].position
-        u = np.dot(tvec, pvec) * inv_det
+        u = vector_operator.dot_product(tvec, pvec) * inv_det
 
         if u < 0 or u > 1:
             return intersect
 
-        qvec = np.cross(tvec, v0v1)
-        v = np.dot(ray.direction, qvec) * inv_det
+        qvec = vector_operator.cross_product(tvec, v0v1)
+        v = vector_operator.dot_product(ray.direction, qvec) * inv_det
 
         if v < 0 or (u + v) > 1:
             return intersect
 
-        t = np.dot(v0v2, qvec) * inv_det
+        t = vector_operator.dot_product(v0v2, qvec) * inv_det
 
         intersect.hit = True
         intersect.distance = t

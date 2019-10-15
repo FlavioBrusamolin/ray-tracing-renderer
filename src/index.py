@@ -1,38 +1,39 @@
-import numpy as np
+from models.vertex import Vertex
+from models.triangle import Triangle
+from models.scene import Scene
+from models.ray import Ray
 
-from models.Vertex import Vertex
-from models.Triangle import Triangle
-from models.Scene import Scene
-from models.Ray import Ray
+from utils.math import Vector3, Vector2
+
+
+def createVertex(x, y, z, u, v):
+    position = Vector3(x, y, z)
+    normal = Vector3(0, 0, 1)
+    uv = Vector2(u, v)
+
+    return Vertex(position.data, normal.data, uv.data)
 
 
 def main():
-    position_vertex1 = np.array([0, 0, 0])
-    position_vertex2 = np.array([2, 0, 0])
-    position_vertex3 = np.array([1, 2, 0])
-    normal = np.array([0, 0, 1])
-    uv = np.array([1, 1])
+    vertex1 = createVertex(0, 0, 0, 0, 0)
+    vertex2 = createVertex(2, 0, 0, 1, 0)
+    vertex3 = createVertex(1, 2, 0, 0, 1)
 
-    first_vertex = Vertex(position_vertex1, normal, uv)
-    second_vertex = Vertex(position_vertex2, normal, uv)
-    third_vertex = Vertex(position_vertex3, normal, uv)
-
-    vertices = [first_vertex, second_vertex, third_vertex]
+    vertices = [vertex1, vertex2, vertex3]
 
     triangle = Triangle(vertices, 'BSDF')
     shapes = [triangle]
 
     scene = Scene(shapes)
 
-    origin = np.array([1, 1, 10])
-    direction = np.array([0, 0, -1])
-    ray = Ray(origin, direction)
+    origin = Vector3(1, 1, 10)
+    direction = Vector3(0, 0, -1)
+    ray = Ray(origin.data, direction.data)
 
     intersection = scene.intersects(ray)
 
-    print(intersection.hit)
-    print(intersection.distance)
-    print(intersection.index)
+    print(
+        f'Hit: {intersection.hit}\nDistance: {intersection.distance}\nIndex: {intersection.index}')
 
 
 if __name__ == "__main__":
