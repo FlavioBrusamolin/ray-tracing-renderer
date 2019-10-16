@@ -5,4 +5,4 @@ class Ray(object):
         self.direction = direction
 
     def point(self, distance):
-        return ''
+        return self.origin + self.direction * distance

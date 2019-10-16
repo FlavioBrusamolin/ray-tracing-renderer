@@ -11,10 +11,11 @@ class Scene(object):
     def intersects(self, ray):
         intersection = Intersection(False, math.inf, -1, None)
 
-        for shape in self.shapes:
+        for index, shape in enumerate(self.shapes):
             shape_intersection = shape.intersects(ray)
 
             if shape_intersection.distance < intersection.distance:
                 intersection = shape_intersection
+                intersection.index = index
 
         return intersection

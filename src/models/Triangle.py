@@ -49,13 +49,13 @@ class Triangle(Shape):
 
         intersect.hit = True
         intersect.distance = t
-        intersect.index = 0
+        intersect.index = -1
         intersect.uv = uv.data
 
         return intersect
 
     def calculate_shader_globals(self, ray, intersection):
-        point = ray.origin + intersection.distance * ray.direction
+        point = ray.point(intersection.distance)
 
         u = intersection.uv[0]
         v = intersection.uv[1]
