@@ -1,27 +1,27 @@
 import numpy as np
 
-epsilon = np.finfo(float).eps
+EPSILON = np.finfo(float).eps
 
 
-class Vector3(object):
-
-    def __init__(self, x, y, z):
-        self.data = np.array([x, y, z])
+def vector2(x, y):
+    return np.array([x, y])
 
 
-class Vector2(object):
-
-    def __init__(self, x, y):
-        self.data = np.array([x, y])
+def vector3(x, y, z):
+    return np.array([x, y, z])
 
 
-class VectorOperator(object):
+def cross_product(vector1, vector2):
+    return np.cross(vector1, vector2)
 
-    def cross_product(self, vector1, vector2):
-        return np.cross(vector1, vector2)
 
-    def dot_product(self, vector1, vector2):
-        return np.dot(vector1, vector2)
+def dot_product(vector1, vector2):
+    return np.dot(vector1, vector2)
 
-    def normalize(self, vector):
-        return vector / np.linalg.norm(vector)
+
+def absolute(vector):
+    return np.linalg.norm(vector)
+
+
+def normalize(vector):
+    return vector / absolute(vector)
