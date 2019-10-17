@@ -10,6 +10,6 @@ class BSDFType(Enum):
 
 class BSDF(object):
 
-    def __init__(self, type, color):
-        self.type = type
+    def __init__(self, description, color):
+        self.description = description
         self.color = color

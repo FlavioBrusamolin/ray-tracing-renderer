@@ -2,6 +2,7 @@ from models.Vertex import Vertex
 from models.Triangle import Triangle
 from models.Scene import Scene
 from models.Ray import Ray
+from models.BSDF import BSDF, BSDFType
 
 from utils.math import Vector3, Vector2
 
@@ -21,7 +22,10 @@ def main():
 
     vertices = [vertex0, vertex1, vertex2]
 
-    triangle = Triangle(vertices, 'BSDF')
+    color = Vector3(0, 0, 0)
+    bsdf = BSDF(BSDFType, color.data)
+
+    triangle = Triangle(vertices, bsdf)
     shapes = [triangle]
 
     scene = Scene(shapes)

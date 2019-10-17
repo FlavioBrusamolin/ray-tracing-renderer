@@ -49,7 +49,6 @@ class Triangle(Shape):
 
         intersect.hit = True
         intersect.distance = t
-        intersect.index = -1
         intersect.uv = uv.data
 
         return intersect
