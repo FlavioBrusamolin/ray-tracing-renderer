@@ -1,6 +1,6 @@
 import math
 
-from .Intersection import Intersection
+from .intersection import Intersection
 
 
 class Scene(object):

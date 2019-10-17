@@ -1,10 +1,10 @@
-from models.Vertex import Vertex
-from models.Triangle import Triangle
-from models.Scene import Scene
-from models.Ray import Ray
-from models.BSDF import BSDF, BSDFType
+from models.vertex import Vertex
+from models.triangle import Triangle
+from models.scene import Scene
+from models.ray import Ray
+from models.bsdf import BSDF, BSDFType
 
-from utils.math import Vector3, Vector2
+from utils.math import Vector3, Vector2, VectorOperator
 
 
 def createVertex(x, y, z, s, t):
@@ -16,6 +16,8 @@ def createVertex(x, y, z, s, t):
 
 
 def main():
+    vec_operator = VectorOperator()
+
     vertex0 = createVertex(0, 0, 0, 0, 0)
     vertex1 = createVertex(2, 0, 0, 1, 0)
     vertex2 = createVertex(1, 2, 0, 0, 1)
@@ -32,17 +34,19 @@ def main():
 
     origin = Vector3(1, 1, 10)
     direction = Vector3(0, 0, -1)
-    ray = Ray(origin.data, direction.data)
+    unitary_direction = vec_operator.normalize(direction.data)
+    ray = Ray(origin.data, unitary_direction)
 
     intersection = scene.intersects(ray)
-
-    print(
-        f'Hit: {intersection.hit}\nDistance: {intersection.distance}\nIndex: {intersection.index}\nUV: {intersection.uv}')
 
     shader_globals = triangle.calculate_shader_globals(ray, intersection)
 
     print(
-        f'\nPoint:{shader_globals.point}\nNormal:{shader_globals.normal}\nUV:{shader_globals.uv}\nST:{shader_globals.st}\nView direction:{shader_globals.view_direction}')
+        f'Hit: {intersection.hit}\nDistance: {intersection.distance}\nIndex: {intersection.index}\nUV: {intersection.uv}')
+
+    print(
+        f'\nPoint:{shader_globals.point}\nNormal:{shader_globals.normal}\nUV:{shader_globals.uv}\nST:{shader_globals.st}',
+        f'\nTangentU:{shader_globals.tangent_u}\nTangentV:{shader_globals.tangent_v}\nView direction:{shader_globals.view_direction}')
 
 
 if __name__ == "__main__":

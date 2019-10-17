@@ -22,3 +22,6 @@ class VectorOperator(object):
 
     def dot_product(self, vector1, vector2):
         return np.dot(vector1, vector2)
+
+    def normalize(self, vector):
+        return vector / np.linalg.norm(vector)
