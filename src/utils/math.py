@@ -34,3 +34,7 @@ def absolute(vector):
 
 def normalize(vector):
     return vector / absolute(vector)
+
+
+def append(vector1, vector2):
+    return np.append(vector1, vector2)
