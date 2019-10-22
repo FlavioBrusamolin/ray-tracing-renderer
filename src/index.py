@@ -1,3 +1,5 @@
+import math
+
 from models.vertex import Vertex
 from models.triangle import Triangle
 from models.scene import Scene
@@ -36,7 +38,7 @@ def main():
     world_matrix = matrix4(vector3(1, 0, 0), vector3(0, 1, 0),
                            vector3(0, 0, 1), vector3(0, 0, 0))
 
-    camera = Camera(45, film, world_matrix)
+    camera = Camera(math.pi / 4, film, world_matrix)
 
     origin = vector3(0, 0, 10)
     direction = normalize(vector3(0, 0, -1))
