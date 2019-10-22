@@ -1,10 +1,12 @@
 from models.vertex import Vertex
 from models.triangle import Triangle
 from models.scene import Scene
+from models.film import Film
+from models.camera import Camera
 from models.ray import Ray
 from models.bsdf import BSDF, BSDFType
 
-from utils.math import vector2, vector3, normalize
+from utils.math import vector2, vector3, matrix4, normalize
 
 
 def createVertex(x, y, z, s, t):
@@ -29,6 +31,12 @@ def main():
     shapes = [triangle]
 
     scene = Scene(shapes)
+
+    film = Film(1920, 1080)
+    world_matrix = matrix4(vector3(1, 0, 0), vector3(0, 1, 0),
+                           vector3(0, 0, 1), vector3(0, 0, 0))
+
+    camera = Camera(45, film, world_matrix)
 
     origin = vector3(0, 0, 10)
     direction = normalize(vector3(0, 0, -1))

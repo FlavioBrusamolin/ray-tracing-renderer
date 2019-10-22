@@ -11,6 +11,15 @@ def vector3(x, y, z):
     return np.array([x, y, z])
 
 
+def matrix4(u, v, w, p):
+    return np.array([
+        [u[0], u[1], u[2], 0],
+        [v[0], v[1], v[2], 0],
+        [w[0], w[1], w[2], 0],
+        [p[0], p[1], p[2], 1]
+    ])
+
+
 def cross_product(vector1, vector2):
     return np.cross(vector1, vector2)
 
