@@ -4,11 +4,11 @@ EPSILON = np.finfo(float).eps
 
 
 def vector2(x, y):
-    return np.array([x, y])
+    return np.array([x, y], np.float64)
 
 
 def vector3(x, y, z):
-    return np.array([x, y, z])
+    return np.array([x, y, z], np.float64)
 
 
 def matrix4(u, v, w, p):

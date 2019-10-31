@@ -1,4 +1,4 @@
-class Intersection(object):
+class Intersection:
 
     def __init__(self, hit, distance, index, uv):
         self.hit = hit

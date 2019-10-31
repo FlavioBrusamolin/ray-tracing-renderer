@@ -3,7 +3,7 @@ import math
 from .intersection import Intersection
 
 
-class Scene(object):
+class Scene:
 
     def __init__(self, shapes):
         self.shapes = shapes

@@ -1,4 +1,4 @@
-class Film(object):
+class Film:
 
     def __init__(self, width, height):
         self.width = width

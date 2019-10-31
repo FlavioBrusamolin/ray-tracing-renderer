@@ -5,7 +5,7 @@ from .ray import Ray
 from utils.math import vector3, matrix4, cross_product, dot_product, normalize, append
 
 
-class Camera(object):
+class Camera:
 
     def __init__(self, field_of_view, film, world_matrix):
         self.field_of_view = field_of_view
@@ -22,8 +22,8 @@ class Camera(object):
     def generate_ray(self, x, y, sample):
         aspect_ratio = self.film.aspect_ratio()
 
-        x_ndc = (x + 0.5) / self.film.width
-        y_ndc = (y + 0.5) / self.film.height
+        x_ndc = (x + 0.5 + sample[0]) / self.film.width
+        y_ndc = (y + 0.5 + sample[1]) / self.film.height
 
         x_screen = 2 * x_ndc - 1
         y_screen = 1 - 2 * y_ndc

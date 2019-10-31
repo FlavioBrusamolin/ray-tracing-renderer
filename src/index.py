@@ -6,6 +6,8 @@ from models.scene import Scene
 from models.film import Film
 from models.camera import Camera
 from models.bsdf import BSDF, BSDFType
+from models.render_options import RenderOptions
+from models.renderer import Renderer
 
 from utils.math import vector2, vector3, matrix4
 
@@ -33,30 +35,21 @@ def main():
 
     scene = Scene(shapes)
 
-    film = Film(1920, 1080)
+    film = Film(200, 200)
     world_matrix = matrix4(vector3(1, 0, 0), vector3(0, 1, 0),
                            vector3(0, 0, 1), vector3(0, 0, 0))
 
-    camera = Camera(math.pi / 4, film, world_matrix)
+    camera = Camera(math.pi / 2, film, world_matrix)
 
     position = vector3(0, 0, 30)
     target = vector3(0, 0, 0)
     up = vector3(0, 1, 0)
     camera.look_at(position, target, up)
 
-    ray = camera.generate_ray(960, 540, vector2(0, 0))
+    render_options = RenderOptions(200, 200, 0, 5, 0, 0, 2, 1, 1)
 
-    intersection = scene.intersects(ray)
-
-    print(f'Hit: {intersection.hit}\nDistance: {intersection.distance}\nIndex: {intersection.index}\nUV: {intersection.uv}')
-
-    if intersection.hit:
-        shader_globals = triangle.calculate_shader_globals(ray, intersection)
-
-        print(
-            f'\nPoint:{shader_globals.point}\nNormal:{shader_globals.normal}\nUV:{shader_globals.uv}\nST:{shader_globals.st}',
-            f'\nTangentU:{shader_globals.tangent_u}\nTangentV:{shader_globals.tangent_v}\nView direction:{shader_globals.view_direction}'
-        )
+    renderer = Renderer(render_options, camera, scene)
+    renderer.render()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-class ShaderGlobals(object):
+class ShaderGlobals:
 
     def __init__(self, point, normal, uv, st, tangent_u, tangent_v, view_direction, light_direction, light_point, light_normal):
         self.point = point

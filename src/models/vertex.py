@@ -1,4 +1,4 @@
-class Vertex(object):
+class Vertex:
 
     def __init__(self, position, normal, st):
         self.position = position

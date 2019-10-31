@@ -8,7 +8,7 @@ class BSDFType(Enum):
     Any = 3
 
 
-class BSDF(object):
+class BSDF:
 
     def __init__(self, description, color):
         self.description = description
