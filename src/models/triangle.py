@@ -1,10 +1,9 @@
-import math
+from math import inf, fabs
+import numpy as np
 
 from .shape import Shape
 from .intersection import Intersection
 from .shader_globals import ShaderGlobals
-
-from utils.math import EPSILON, vector2, cross_product, dot_product, absolute, normalize
 
 
 class Triangle(Shape):
@@ -14,7 +13,7 @@ class Triangle(Shape):
         self.vertices = vertices
 
     def intersects(self, ray):
-        intersect = Intersection(False, math.inf, -1, None)
+        intersect = Intersection(False, inf, -1, None)
 
         vertex0 = self.vertices[0]
         vertex1 = self.vertices[1]
@@ -23,30 +22,30 @@ class Triangle(Shape):
         edge1 = vertex1.position - vertex0.position
         edge2 = vertex2.position - vertex0.position
 
-        pvec = cross_product(ray.direction, edge2)
-        det = dot_product(edge1, pvec)
+        pvec = np.cross(ray.direction, edge2)
+        det = np.dot(edge1, pvec)
 
-        if math.fabs(det) < EPSILON:
+        if fabs(det) < np.finfo(float).eps:
             return intersect
 
         inv_det = 1 / det
         tvec = ray.origin - vertex0.position
-        u = dot_product(tvec, pvec) * inv_det
+        u = np.dot(tvec, pvec) * inv_det
 
         if u < 0 or u > 1:
             return intersect
 
-        qvec = cross_product(tvec, edge1)
-        v = dot_product(ray.direction, qvec) * inv_det
+        qvec = np.cross(tvec, edge1)
+        v = np.dot(ray.direction, qvec) * inv_det
 
         if v < 0 or u + v > 1:
             return intersect
 
-        t = dot_product(edge2, qvec) * inv_det
+        t = np.dot(edge2, qvec) * inv_det
 
         intersect.hit = True
         intersect.distance = t
-        intersect.uv = vector2(u, v)
+        intersect.uv = np.array([u, v])
 
         return intersect
 
@@ -61,8 +60,8 @@ class Triangle(Shape):
 
         point = ray.point(intersection.distance)
 
-        normal = normalize(
-            vertex0.normal * w + vertex1.normal * u + vertex2.normal * v)
+        _normal = vertex0.normal * w + vertex1.normal * u + vertex2.normal * v
+        normal = _normal / np.linalg.norm(_normal)
 
         st = vertex0.st * w + vertex1.st * u + vertex2.st * v
 
@@ -84,6 +83,6 @@ class Triangle(Shape):
         u = vertex1.position - vertex0.position
         v = vertex2.position - vertex0.position
 
-        area = absolute(cross_product(u, v)) / 2
+        area = np.linalg.norm(np.cross(u, v)) / 2
 
         return area

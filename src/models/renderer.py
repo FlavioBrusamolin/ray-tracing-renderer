@@ -1,11 +1,7 @@
-import math
+from math import ceil, sqrt, exp
 from random import random
-
 from PIL import Image
-
 import numpy as np
-
-from utils.math import vector3, vector2
 
 
 class Renderer:
@@ -25,9 +21,9 @@ class Renderer:
         intersection = self.scene.intersects(ray)
 
         if intersection.hit:
-            return vector3(1, 1, 1)
+            return np.array([1, 1, 1])
 
-        return vector3(0, 0, 0)
+        return np.array([0, 0, 0])
 
     def render(self):
         camera_samples = self.options.camera_samples
@@ -40,11 +36,11 @@ class Renderer:
             for j in range(self.camera.film.height):
                 samples = self.stratified_samples(camera_samples)
 
-                color = vector3(0, 0, 0)
+                color = np.array([0, 0, 0], np.float64)
                 total_weight = 0.0
 
                 for k in range(camera_samples):
-                    sample = (samples[k] - vector2(0.5, 0.5)) * filter_width
+                    sample = (samples[k] - np.array([0.5, 0.5])) * filter_width
                     ray = self.camera.generate_ray(i, j, sample)
                     weight = self.gaussian_2d(sample, filter_width)
 
@@ -65,36 +61,42 @@ class Renderer:
         im.show()
 
     def stratified_samples(self, samples):
-        size = math.ceil(math.sqrt(samples))
+        size = ceil(sqrt(samples))
 
         points = []
 
         for i in range(size):
             for j in range(size):
-                offset = vector2(i, j)
-                points.append((offset + vector2(random(), random())) / size)
+                offset = np.array([i, j])
+                points.append((offset + np.array([random(), random()])) / size)
 
         return points
 
     def gaussian_2d(self, sample, filter_width):
         r = filter_width / 2
 
-        k_x = max(math.exp(- sample[0] * sample[0]) - math.exp(- r * r), 0)
-        k_y = max(math.exp(- sample[1] * sample[1]) - math.exp(- r * r), 0)
+        k_x = max(exp(- sample[0] * sample[0]) - exp(- r * r), 0)
+        k_y = max(exp(- sample[1] * sample[1]) - exp(- r * r), 0)
 
         return k_x * k_y
 
     def gamma(self, color, value):
         inverse_gamma = 1 / value
 
-        return vector3(pow(color[0], inverse_gamma),
-                       pow(color[1], inverse_gamma),
-                       pow(color[2], inverse_gamma))
+        return np.array([
+            pow(color[0], inverse_gamma),
+            pow(color[1], inverse_gamma),
+            pow(color[2], inverse_gamma)]
+        )
 
     def exposure(self, color, value):
         power = pow(2, value)
 
-        return vector3(color[0] * power, color[1] * power, color[2] * power)
+        return np.array([
+            color[0] * power,
+            color[1] * power,
+            color[2] * power]
+        )
 
     def saturate(self, color):
         def truncate(value):

@@ -1,8 +1,7 @@
-import math
+from math import tan
+import numpy as np
 
 from .ray import Ray
-
-from utils.math import vector3, matrix4, cross_product, dot_product, normalize, append
 
 
 class Camera:
@@ -13,11 +12,20 @@ class Camera:
         self.world_matrix = world_matrix
 
     def look_at(self, position, target, up):
-        w = normalize(position - target)
-        u = normalize(cross_product(up, w))
-        v = cross_product(w, u)
+        _w = position - target
+        w = _w / np.linalg.norm(_w)
 
-        self.world_matrix = matrix4(u, v, w, position)
+        _u = np.cross(up, w)
+        u = _u / np.linalg.norm(_u)
+
+        v = np.cross(w, u)
+
+        self.world_matrix = np.array([
+            [u[0], u[1], u[2], 0],
+            [v[0], v[1], v[2], 0],
+            [w[0], w[1], w[2], 0],
+            [position[0], position[1], position[2], 1]
+        ])
 
     def generate_ray(self, x, y, sample):
         aspect_ratio = self.film.aspect_ratio()
@@ -28,18 +36,19 @@ class Camera:
         x_screen = 2 * x_ndc - 1
         y_screen = 1 - 2 * y_ndc
 
-        focal_distance = math.tan(self.field_of_view / 2)
+        focal_distance = tan(self.field_of_view / 2)
 
         x_camera = aspect_ratio * focal_distance * x_screen
         y_camera = focal_distance * y_screen
         z_camera = -1
-        p_camera = append(vector3(x_camera, y_camera, z_camera), 1)
+        p_camera = np.append(np.array([x_camera, y_camera, z_camera]), 1)
 
-        p_world = dot_product(self.world_matrix, p_camera)[:-1]
+        p_world = np.dot(self.world_matrix, p_camera)[:-1]
 
         camera_position = (self.world_matrix[3, ])[:-1]
 
-        direction = normalize(p_world - camera_position)
+        _direction = p_world - camera_position
+        direction = _direction / np.linalg.norm(_direction)
         origin = camera_position
 
         return Ray(origin, direction)

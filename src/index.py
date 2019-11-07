@@ -1,4 +1,5 @@
-import math
+from math import pi
+import numpy as np
 
 from models.vertex import Vertex
 from models.triangle import Triangle
@@ -9,13 +10,11 @@ from models.bsdf import BSDF, BSDFType
 from models.render_options import RenderOptions
 from models.renderer import Renderer
 
-from utils.math import vector2, vector3, matrix4
-
 
 def createVertex(x, y, z, s, t):
-    position = vector3(x, y, z)
-    normal = vector3(0, 0, 1)
-    st = vector2(s, t)
+    position = np.array([x, y, z])
+    normal = np.array([0, 0, 1])
+    st = np.array([s, t])
 
     return Vertex(position, normal, st)
 
@@ -27,7 +26,7 @@ def main():
 
     vertices = [vertex0, vertex1, vertex2]
 
-    color = vector3(0, 0, 0)
+    color = np.array([0, 0, 0])
     bsdf = BSDF(BSDFType, color)
 
     triangle = Triangle(vertices, bsdf)
@@ -36,17 +35,21 @@ def main():
     scene = Scene(shapes)
 
     film = Film(200, 200)
-    world_matrix = matrix4(vector3(1, 0, 0), vector3(0, 1, 0),
-                           vector3(0, 0, 1), vector3(0, 0, 0))
+    world_matrix = np.array([
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+    ])
 
-    camera = Camera(math.pi / 2, film, world_matrix)
+    camera = Camera(pi / 2, film, world_matrix)
 
-    position = vector3(0, 0, 30)
-    target = vector3(0, 0, 0)
-    up = vector3(0, 1, 0)
+    position = np.array([0, 0, 30])
+    target = np.array([0, 0, 0])
+    up = np.array([0, 1, 0])
     camera.look_at(position, target, up)
 
-    render_options = RenderOptions(200, 200, 0, 5, 0, 0, 2, 1, 1)
+    render_options = RenderOptions(200, 200, 0, 2, 0, 0, 2, 1, 1)
 
     renderer = Renderer(render_options, camera, scene)
     renderer.render()
