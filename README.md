@@ -1,2 +1,2 @@
 # ray-tracing-renderer
-A ray-tracing renderer for computer graphics discipline
+A ray-tracing renderer for computer graphics discipline.
