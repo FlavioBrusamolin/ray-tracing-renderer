@@ -5,8 +5,9 @@ from .intersection import Intersection
 
 class Scene:
 
-    def __init__(self, shapes):
+    def __init__(self, shapes, light_group):
         self.shapes = shapes
+        self.light_group = light_group
 
     def intersects(self, ray):
         intersection = Intersection(False, inf, -1, None)

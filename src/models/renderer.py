@@ -3,6 +3,8 @@ from random import random
 from PIL import Image
 import numpy as np
 
+from .bsdf import BSDFType
+
 
 class Renderer:
 
@@ -18,10 +20,22 @@ class Renderer:
         pass
 
     def trace(self, ray, depth):
+        if depth >= self.options.maximum_depth:
+            return np.array([0, 0, 0])
+
         intersection = self.scene.intersects(ray)
 
         if intersection.hit:
-            return np.array([1, 1, 1])
+            shape = self.scene.shapes[intersection.index]
+            bsdf = shape.bsdf
+
+            if bsdf.description == BSDFType['Light']:
+                return bsdf.color if depth == 0 else np.array([0, 0, 0])
+
+            shader_globals = shape.calculate_shader_globals(ray, intersection)
+
+            return self.compute_direct_illumination(bsdf, shader_globals) + \
+                   self.compute_indirect_illumination(bsdf, shader_globals, depth + 1)
 
         return np.array([0, 0, 0])
 

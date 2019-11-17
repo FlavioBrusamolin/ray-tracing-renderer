@@ -17,3 +17,7 @@ class Shape(metaclass=ABCMeta):
     @abstractmethod
     def surface_area(self):
         pass
+
+    @abstractmethod
+    def uniform_sample(self):
+        pass

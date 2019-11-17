@@ -4,6 +4,7 @@ import numpy as np
 from .shape import Shape
 from .intersection import Intersection
 from .shader_globals import ShaderGlobals
+from .utils import uniform_sample_triangle
 
 
 class Triangle(Shape):
@@ -86,3 +87,12 @@ class Triangle(Shape):
         area = np.linalg.norm(np.cross(u, v)) / 2
 
         return area
+
+    def uniform_sample(self, sample):
+        v0 = self.vertices[0].position
+        v1 = self.vertices[1].position
+        v2 = self.vertices[2].position
+
+        b = uniform_sample_triangle(sample)
+
+        return v0 * b[0] + v1 * b[1] + v2 * b[2]

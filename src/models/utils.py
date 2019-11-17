@@ -1,0 +1,10 @@
+from math import sqrt
+import numpy as np
+
+
+def uniform_sample_triangle(sample):
+    s = sqrt(sample[0])
+    u = 1.0 - s
+    v = s * sample[1]
+
+    return np.array([u, v, 1.0 - u - v])

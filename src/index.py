@@ -32,7 +32,7 @@ def main():
     triangle = Triangle(vertices, bsdf)
     shapes = [triangle]
 
-    scene = Scene(shapes)
+    scene = Scene(shapes, None)
 
     film = Film(200, 200)
     world_matrix = np.array([
