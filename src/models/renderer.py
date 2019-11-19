@@ -1,9 +1,10 @@
-from math import ceil, sqrt, exp
-from random import random
+from math import ceil, sqrt, exp, pi
+from random import random, choice
 from PIL import Image
 import numpy as np
 
 from .bsdf import BSDFType
+from .ray import Ray
 
 
 class Renderer:
@@ -14,7 +15,41 @@ class Renderer:
         self.scene = scene
 
     def compute_direct_illumination(self, bsdf, shader_globals):
-        pass
+        light_group = self.scene.light_group
+
+        if len(light_group) == 0:
+            return np.array([0, 0, 0])
+
+        lo = np.array([0, 0, 0])
+
+        for i in range(self.options.light_samples):
+            light = choice(light_group)
+
+            shader_globals.light_point = light.uniform_sample(
+                np.array([random(), random()]))
+
+            _direction = shader_globals.light_point - shader_globals.point
+            distance = np.linalg.norm(_direction)
+            direction = _direction / distance
+
+            shadow_ray = Ray(shader_globals.point + 0.01 *
+                             shader_globals.normal, direction)
+
+            intersection = self.scene.intersects(shadow_ray)
+
+            if self.scene.shapes[intersection.index] == light and intersection.index != -1:
+                fr = bsdf.color / pi
+                pdf = 1.0 / (light.surface_area() * float(len(light_group)))
+                li = light.bsdf.color
+                wi = direction
+                n = shader_globals.normal
+                light_normal = light.calculate_shader_globals(
+                    shadow_ray, intersection).normal
+
+                lo = lo + (fr / pdf) * li * np.dot(wi, n) * \
+                    (np.dot(-wi, light_normal) / (distance * distance))
+
+        return lo
 
     def compute_indirect_illumination(self, bsdf, shader_globals, depth):
         pass
@@ -29,13 +64,15 @@ class Renderer:
             shape = self.scene.shapes[intersection.index]
             bsdf = shape.bsdf
 
-            if bsdf.description == BSDFType['Light']:
+            if bsdf.description == BSDFType.Light:
                 return bsdf.color if depth == 0 else np.array([0, 0, 0])
 
             shader_globals = shape.calculate_shader_globals(ray, intersection)
 
-            return self.compute_direct_illumination(bsdf, shader_globals) + \
-                   self.compute_indirect_illumination(bsdf, shader_globals, depth + 1)
+            return self.compute_direct_illumination(bsdf, shader_globals)
+
+            # return self.compute_direct_illumination(bsdf, shader_globals) + \
+            #        self.compute_indirect_illumination(bsdf, shader_globals, depth + 1)
 
         return np.array([0, 0, 0])
 
