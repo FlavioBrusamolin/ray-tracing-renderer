@@ -6,6 +6,8 @@ import numpy as np
 from .bsdf import BSDFType
 from .ray import Ray
 
+from .utils import uniform_sample_hemisphere
+
 
 class Renderer:
 
@@ -20,15 +22,18 @@ class Renderer:
         if len(light_group) == 0:
             return np.array([0, 0, 0])
 
+        fr = bsdf.color / pi
+        n = shader_globals.normal
+
         lo = np.array([0, 0, 0])
 
         for i in range(self.options.light_samples):
             light = choice(light_group)
 
-            shader_globals.light_point = light.uniform_sample(
+            light_point = light.uniform_sample(
                 np.array([random(), random()]))
 
-            _direction = shader_globals.light_point - shader_globals.point
+            _direction = light_point - shader_globals.point
             distance = np.linalg.norm(_direction)
             direction = _direction / distance
 
@@ -38,21 +43,46 @@ class Renderer:
             intersection = self.scene.intersects(shadow_ray)
 
             if self.scene.shapes[intersection.index] == light and intersection.index != -1:
-                fr = bsdf.color / pi
                 pdf = 1.0 / (light.surface_area() * float(len(light_group)))
                 li = light.bsdf.color
                 wi = direction
-                n = shader_globals.normal
                 light_normal = light.calculate_shader_globals(
                     shadow_ray, intersection).normal
 
-                lo = lo + (fr / pdf) * li * np.dot(wi, n) * \
-                    (np.dot(-wi, light_normal) / (distance * distance))
+                lo = lo + (fr / pdf) * li * max(np.dot(wi, n), 0) * \
+                    (max(np.dot(-wi, light_normal), 0) / (distance * distance))
 
-        return lo
+        return lo / self.options.light_samples
 
     def compute_indirect_illumination(self, bsdf, shader_globals, depth):
-        pass
+        fr = bsdf.color / pi
+        pdf = 1.0 / (2.0 * pi)
+        n = shader_globals.normal
+
+        lo = np.array([0, 0, 0])
+
+        for i in range(self.options.diffuse_samples):
+            direction = uniform_sample_hemisphere(
+                np.array([random(), random()]))
+
+            world_matrix = np.array([
+                np.append(shader_globals.tangent_u, 0),
+                np.append(shader_globals.normal, 0),
+                np.append(shader_globals.tangent_v, 0),
+                [0, 0, 0, 1]
+            ])
+
+            direction = np.dot(np.append(direction, 0), world_matrix)[:-1]
+
+            ray = Ray(shader_globals.point + 0.01 *
+                      shader_globals.normal, direction)
+
+            li = self.trace(ray, depth)
+            wi = direction
+
+            lo = lo + (fr / pdf) * li * max(np.dot(wi, n), 0)
+
+        return lo / self.options.diffuse_samples
 
     def trace(self, ray, depth):
         if depth >= self.options.maximum_depth:
@@ -69,10 +99,8 @@ class Renderer:
 
             shader_globals = shape.calculate_shader_globals(ray, intersection)
 
-            return self.compute_direct_illumination(bsdf, shader_globals)
-
-            # return self.compute_direct_illumination(bsdf, shader_globals) + \
-            #        self.compute_indirect_illumination(bsdf, shader_globals, depth + 1)
+            return self.compute_direct_illumination(bsdf, shader_globals) \
+                + self.compute_indirect_illumination(bsdf, shader_globals, depth + 1)
 
         return np.array([0, 0, 0])
 
@@ -83,8 +111,8 @@ class Renderer:
         image = np.zeros(
             (self.camera.film.width, self.camera.film.height, 3), np.uint8)
 
-        for i in range(self.camera.film.width):
-            for j in range(self.camera.film.height):
+        for i in range(self.camera.film.height):
+            for j in range(self.camera.film.width):
                 samples = self.stratified_samples(camera_samples)
 
                 color = np.array([0, 0, 0], np.float64)
@@ -110,6 +138,7 @@ class Renderer:
 
         im = Image.fromarray(image)
         im.show()
+        im.save("cornell_box.jpg")
 
     def stratified_samples(self, samples):
         size = ceil(sqrt(samples))

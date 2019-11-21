@@ -14,6 +14,8 @@ class Triangle(Shape):
         self.vertices = vertices
 
     def intersects(self, ray):
+        epsilon = 0.0000001
+        
         intersect = Intersection(False, inf, -1, None)
 
         vertex0 = self.vertices[0]
@@ -26,7 +28,7 @@ class Triangle(Shape):
         pvec = np.cross(ray.direction, edge2)
         det = np.dot(edge1, pvec)
 
-        if fabs(det) < np.finfo(float).eps:
+        if fabs(det) < epsilon:
             return intersect
 
         inv_det = 1 / det
@@ -43,6 +45,9 @@ class Triangle(Shape):
             return intersect
 
         t = np.dot(edge2, qvec) * inv_det
+        
+        if t <= epsilon or t >= 1.0 / epsilon:
+            return intersect
 
         intersect.hit = True
         intersect.distance = t
@@ -66,10 +71,18 @@ class Triangle(Shape):
 
         st = vertex0.st * w + vertex1.st * u + vertex2.st * v
 
-        tangent_u = vertex1.position - vertex0.position
-        tangent_v = vertex2.position - vertex0.position
+        tangent_u = np.zeros(3)
 
-        view_direction = ray.direction * -1
+        if abs(normal[0]) >= abs(normal[1]):
+            tg = np.array([normal[2], 0.0, -normal[0]])
+            tangent_u = tg / np.linalg.norm(tg)
+        else:
+            tg = np.array([0.0, -normal[2], normal[1]])
+            tangent_u = tg / np.linalg.norm(tg) 
+
+        tangent_v = np.cross(normal, tangent_u)
+
+        view_direction = -ray.direction
 
         shader_globals = ShaderGlobals(
             point, normal, intersection.uv, st, tangent_u, tangent_v, view_direction, None, None, None)

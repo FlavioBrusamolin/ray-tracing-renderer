@@ -15,7 +15,7 @@ class Scene:
         for index, shape in enumerate(self.shapes):
             shape_intersection = shape.intersects(ray)
 
-            if shape_intersection.distance < intersection.distance:
+            if shape_intersection.hit and shape_intersection.distance < intersection.distance:
                 intersection = shape_intersection
                 intersection.index = index
 
